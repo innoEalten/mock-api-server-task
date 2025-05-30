@@ -34,9 +34,9 @@ export class AuthService {
     pass: string,
   ): Promise<Omit<User, 'password'> | null> {
     const user = await this.usersService.findByEmail(email);
-    // Ensure user exists and has a password set, then compare hashed password
     if (user && user.password && (await bcrypt.compare(pass, user.password))) {
-      const { password, ...result } = user; // Exclude password from the returned user object
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...result } = user;
       return result;
     }
     return null;
@@ -77,7 +77,8 @@ export class AuthService {
       ...createUserDto,
       password: hashedPassword, // Pass the hashed password to createUser
     });
-    const { password, ...result } = newUser; // Exclude password from result
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...result } = newUser;
     return result;
   }
 

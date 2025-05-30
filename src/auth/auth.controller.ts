@@ -16,6 +16,11 @@ import { CreateUserDto } from '../users/models/create-user.dto'; // For registra
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '../users/models/user.entity'; // Assuming User entity is needed for return types
 
+// Define an interface for the request object to include the user property
+interface RequestWithUser extends Request {
+  user: User;
+}
+
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -41,14 +46,15 @@ export class AuthController {
   // Example of a protected route
   @UseGuards(AuthGuard('jwt')) // Use the 'jwt' strategy from passport
   @Get('profile')
-  getProfile(@Request() req): Omit<User, 'password'> {
+  getProfile(@Request() req: RequestWithUser): Omit<User, 'password'> {
     // req.user will be the User entity instance from JwtStrategy
     // req.user is populated by the JwtStrategy
     // The password field is already excluded by the User entity's `@Column({ select: false })` decorator
     // or should be manually excluded if not.
     // Forcing Omit<User, 'password'> is a good practice for explicit contract.
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...userWithoutPassword } = req.user; // req.user is User, so password exists here
-    return userWithoutPassword; // Ensure this matches Omit<User, 'password'>
+    return userWithoutPassword as Omit<User, 'password'>; // Ensure this matches Omit<User, 'password'>
   }
 
   // Smoke test endpoint
